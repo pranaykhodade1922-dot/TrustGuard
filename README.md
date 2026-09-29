@@ -50,6 +50,7 @@ TrustGuard AI is an AI-powered security and privacy checkpoint that analyzes con
 * **Repository:** [https://github.com/pranaykhodade1922-dot/TrustGuard.git](https://github.com/pranaykhodade1922-dot/TrustGuard.git)
 * **Live Application:** [https://trust-guard-silk.vercel.app](https://trust-guard-silk.vercel.app)
 * **Backend Health Probe:** [https://trustguard-aads.onrender.com/api/health](https://trustguard-aads.onrender.com/api/health)
+* **Video Recording:** [Google Drive Video](https://drive.google.com/drive/folders/1EiAuHOFaThqicXuWR0g2okR07aT9GQ0b?usp=sharing)
 * **Team:**
   1. **Pranay Khodade**
   2. **Suraj Khanse**
