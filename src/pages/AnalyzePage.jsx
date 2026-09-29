@@ -1,5 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { Upload, Trash2, Shield, Info, AlertTriangle, FileText, Clock } from 'lucide-react';
+import {
+  Upload,
+  Trash2,
+  Shield,
+  Info,
+  AlertTriangle,
+  FileText,
+  Clock,
+  Sparkles,
+  UserCheck,
+  KeyRound,
+  ShieldCheck,
+  ArrowUpRight,
+} from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { RiskIndicator, CategoryRiskCards } from '../components/common/RiskIndicator';
 import { FindingCard } from '../components/analysis/FindingCard';
@@ -7,6 +20,79 @@ import { RedactedPreview } from '../components/analysis/RedactedPreview';
 import { ActionPanel } from '../components/analysis/ActionPanel';
 import { LoadingProgress } from '../components/analysis/LoadingProgress';
 import { useApp } from '../context/AppContext';
+
+// Realistic sample checks for demonstration (Fictional, non-production data only)
+const EXAMPLE_CHECKS = [
+  {
+    id: 'example-pii',
+    title: 'Personal Information',
+    category: 'Privacy',
+    icon: UserCheck,
+    iconColor: 'text-[#D97706]',
+    iconBg: 'bg-[#FEF3C7] border-[#FDE68A]',
+    badgeLabel: 'PII Check',
+    description: 'Detect personal data such as email addresses and phone numbers.',
+    content: `Hi John,
+
+Please contact me at pranay.demo@example.com
+or call me at +91 98765 43210 regarding the account update.
+
+Thanks.`,
+  },
+  {
+    id: 'example-credentials',
+    title: 'Credentials & Secrets',
+    category: 'Credentials',
+    icon: KeyRound,
+    iconColor: 'text-[#DC2626]',
+    iconBg: 'bg-[#FEE2E2] border-[#FECACA]',
+    badgeLabel: 'Secret Check',
+    description: 'Identify passwords, credentials, and secret-like information before sharing.',
+    demoNotice: 'Demo data — do not use real credentials.',
+    content: `Hello Team,
+
+Here are the temporary credentials for the demo account:
+
+Username: demo.user@example.com
+Password: TrustGuardDemo123!
+
+Please change the password after the first login.`,
+  },
+  {
+    id: 'example-phishing',
+    title: 'Phishing & Social Engineering',
+    category: 'Social Eng.',
+    icon: AlertTriangle,
+    iconColor: 'text-[#7C3AED]',
+    iconBg: 'bg-[#F3E8FF] border-[#E9D5FF]',
+    badgeLabel: 'Threat Check',
+    description: 'Detect urgency, suspicious links, impersonation, and requests for sensitive information.',
+    content: `URGENT!
+
+Your account will be permanently suspended within 30 minutes.
+
+Click the link below immediately to verify your account:
+http://account-verification-example.com
+
+Send your verification code and password to complete the verification.`,
+  },
+  {
+    id: 'example-safe',
+    title: 'Safe Message',
+    category: 'Benign',
+    icon: ShieldCheck,
+    iconColor: 'text-[#16A34A]',
+    iconBg: 'bg-[#DCFCE7] border-[#BBF7D0]',
+    badgeLabel: 'Clean Check',
+    description: 'See how TrustGuard handles ordinary, low-risk content.',
+    content: `Hi team,
+
+Our meeting is scheduled for tomorrow at 10 AM.
+Please review the project notes before the meeting.
+
+Thanks.`,
+  },
+];
 
 export function AnalyzePage() {
   const {
@@ -22,6 +108,7 @@ export function AnalyzePage() {
 
   const [selectedFindingId, setSelectedFindingId] = useState(null);
   const fileInputRef = useRef(null);
+  const editorRef = useRef(null);
 
   const handleTextChange = (e) => {
     setActiveText(e.target.value);
@@ -31,6 +118,16 @@ export function AnalyzePage() {
     setActiveText('');
     setCurrentAnalysis(null);
     setSelectedFindingId(null);
+  };
+
+  const handleLoadExample = (content) => {
+    setActiveText(content);
+    setCurrentAnalysis(null);
+    setSelectedFindingId(null);
+    showToast('Example check loaded into editor. Click "Analyze & Protect" to inspect.', 'info');
+    if (editorRef.current) {
+      editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -87,7 +184,7 @@ export function AnalyzePage() {
       </div>
 
       {/* Primary Input Editor Card */}
-      <div className="bg-white border border-[#E5E7EB] rounded-xl shadow-xs overflow-hidden">
+      <div ref={editorRef} className="bg-white border border-[#E5E7EB] rounded-xl shadow-xs overflow-hidden">
         {/* Editor Top Toolbar */}
         <div className="px-4 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB] flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
@@ -168,6 +265,69 @@ export function AnalyzePage() {
               Analyze &amp; Protect
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Example Checks Section */}
+      <div className="space-y-3">
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7280] flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span>Example Checks</span>
+            </h3>
+          </div>
+          <p className="text-xs text-[#6B7280] mt-1">
+            Try a sample check to see how TrustGuard detects, explains, and protects sensitive content.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {EXAMPLE_CHECKS.map((example) => {
+            const IconComponent = example.icon;
+            return (
+              <div
+                key={example.id}
+                className="bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] rounded-xl p-4 shadow-xs transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${example.iconBg}`}>
+                      <IconComponent className={`w-4 h-4 ${example.iconColor}`} />
+                    </div>
+                    <span className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider bg-[#F3F4F6] px-2 py-0.5 rounded border border-[#E5E7EB]">
+                      {example.category}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-[#111827]">
+                    {example.title}
+                  </h4>
+                  <p className="text-[11px] text-[#6B7280] mt-1 leading-relaxed">
+                    {example.description}
+                  </p>
+
+                  {example.demoNotice && (
+                    <div className="mt-2 text-[10px] text-[#9CA3AF] italic">
+                      {example.demoNotice}
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3.5 mt-3 border-t border-[#F3F4F6]">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleLoadExample(example.content)}
+                    className="w-full text-xs font-medium cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <span>Try Example</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
