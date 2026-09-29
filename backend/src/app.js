@@ -14,22 +14,32 @@ const app = express();
 // 1. Security HTTP Headers
 app.use(helmet());
 
-// 2. CORS Configuration (Restricted to frontend origin)
+// Helper to normalize origin strings (removes trailing slashes and whitespace)
+const normalizeOrigin = (url) => (url ? url.trim().replace(/\/+$/, '') : '');
+
+// 2. CORS Configuration (Restricted to authorized frontend origins)
+const allowedOrigins = [
+  normalizeOrigin(env.FRONTEND_URL),
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+].filter(Boolean);
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = [env.FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'];
-      if (allowedOrigins.includes(origin)) {
+      const normalizedIncoming = normalizeOrigin(origin);
+      if (allowedOrigins.includes(normalizedIncoming)) {
         return callback(null, true);
       }
-      return callback(new Error('Cross-Origin Request Blocked by CORS policy'));
+      return callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
   })
 );
 
